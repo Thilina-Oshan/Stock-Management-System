@@ -1,0 +1,677 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Stockroom — Inventory Dashboard</title>
+<!-- Fonts -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<!-- Bootstrap 5 -->
+<link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/css/bootstrap.min.css" rel="stylesheet">
+<!-- Font Awesome -->
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" rel="stylesheet">
+<!-- Custom styles -->
+<link href="/asset/css/index.css" rel="stylesheet">
+</head>
+<body>
+
+<div class="app-shell">
+
+  <!-- ============================== SIDEBAR ============================== -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar__brand">
+      <div class="sidebar__brand-mark">SR</div>
+      <span class="sidebar__brand-text">Stockroom</span>
+    </div>
+
+    <nav class="sidebar__nav">
+      <div class="nav-section__label">General</div>
+      <a href="#" class="nav-link active">
+        <i class="fa-solid fa-gauge-high"></i>
+        <span class="nav-link__text">Dashboard</span>
+      </a>
+      <a href="#" class="nav-link">
+        <i class="fa-solid fa-boxes-stacked"></i>
+        <span class="nav-link__text">Products List</span>
+      </a>
+      <a href="#" class="nav-link" data-bs-toggle="modal" data-bs-target="#addProductModal">
+        <i class="fa-solid fa-circle-plus"></i>
+        <span class="nav-link__text">Add / Edit Product</span>
+      </a>
+      <a href="#" class="nav-link">
+        <i class="fa-solid fa-tags"></i>
+        <span class="nav-link__text">Categories</span>
+      </a>
+
+      <div class="nav-section__label">Operations</div>
+      <a href="#" class="nav-link">
+        <i class="fa-solid fa-right-left"></i>
+        <span class="nav-link__text">Stock Control</span>
+        <span class="nav-link__badge">6</span>
+      </a>
+      <a href="#" class="nav-link">
+        <i class="fa-solid fa-truck-field"></i>
+        <span class="nav-link__text">Suppliers</span>
+      </a>
+      <a href="#" class="nav-link">
+        <i class="fa-solid fa-chart-line"></i>
+        <span class="nav-link__text">Analytics &amp; Reports</span>
+      </a>
+
+      <div class="nav-section__label">System</div>
+      <a href="#" class="nav-link">
+        <i class="fa-solid fa-gear"></i>
+        <span class="nav-link__text">Settings</span>
+      </a>
+    </nav>
+
+    <div class="sidebar__footer">
+      <span class="nav-link__text">Stockroom v2.4 · Warehouse #03</span>
+    </div>
+  </aside>
+
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+  <!-- ============================== MAIN COLUMN ============================== -->
+  <div class="main-col">
+
+    <!-- Topbar -->
+    <header class="topbar">
+      <button class="sidebar-toggle-btn" id="sidebarToggle" aria-label="Toggle sidebar">
+        <i class="fa-solid fa-bars"></i>
+      </button>
+
+      <div class="topbar__search">
+        <i class="fa-solid fa-magnifying-glass"></i>
+        <input type="text" placeholder="Search products, SKUs, suppliers…" aria-label="Global search">
+      </div>
+
+      <div class="topbar__spacer"></div>
+
+      <div class="theme-switch">
+        <i class="fa-solid fa-sun"></i>
+        <div class="form-check form-switch mb-0">
+          <input class="form-check-input" type="checkbox" role="switch" id="themeSwitch" aria-label="Toggle dark mode">
+        </div>
+        <i class="fa-solid fa-moon"></i>
+      </div>
+
+      <button class="icon-btn" aria-label="Notifications">
+        <i class="fa-regular fa-bell"></i>
+        <span class="badge-dot"></span>
+      </button>
+
+      <div class="dropdown">
+        <button class="user-menu" data-bs-toggle="dropdown" aria-expanded="false">
+          <div class="user-menu__avatar">JD</div>
+          <div class="user-menu__meta">
+            <div class="user-menu__name">Jordan Diaz</div>
+            <div class="user-menu__role">Warehouse Manager</div>
+          </div>
+          <i class="fa-solid fa-chevron-down" style="font-size:0.7rem; color: var(--text-secondary);"></i>
+        </button>
+        <ul class="dropdown-menu dropdown-menu-end mt-2">
+          <li><a class="dropdown-item" href="#"><i class="fa-regular fa-user me-2"></i>My profile</a></li>
+          <li><a class="dropdown-item" href="#"><i class="fa-solid fa-gear me-2"></i>Account settings</a></li>
+          <li><hr class="dropdown-divider"></li>
+          <li><a class="dropdown-item" href="#"><i class="fa-solid fa-right-from-bracket me-2"></i>Sign out</a></li>
+        </ul>
+      </div>
+    </header>
+
+    <!-- Page content -->
+    <main class="page-content">
+
+      <div class="page-header">
+        <div>
+          <h1>Dashboard</h1>
+          <p>Here's what's moving in the warehouse today, Sep 17.</p>
+        </div>
+        <div class="d-flex gap-2">
+          <button class="btn-outline-quiet"><i class="fa-solid fa-arrow-up-from-bracket me-2"></i>Export</button>
+          <button class="btn-brand" id="openAddProductBtnHeader"><i class="fa-solid fa-plus me-2"></i>Add product</button>
+        </div>
+      </div>
+
+      <!-- ============================== KPI CARDS ============================== -->
+      <div class="row g-3 mb-4">
+        <div class="col-6 col-lg-3">
+          <div class="kpi-card">
+            <div class="kpi-card__top">
+              <span class="kpi-card__label">Total products</span>
+              <div class="kpi-card__icon kpi-card__icon--brand"><i class="fa-solid fa-boxes-stacked"></i></div>
+            </div>
+            <div class="kpi-card__value">1,284</div>
+            <div class="kpi-card__trend up"><i class="fa-solid fa-arrow-trend-up"></i> +36 this month</div>
+          </div>
+        </div>
+
+        <div class="col-6 col-lg-3">
+          <div class="kpi-card kpi-card--alert">
+            <div class="kpi-card__top">
+              <span class="kpi-card__label">Low stock alert</span>
+              <div class="kpi-card__icon kpi-card__icon--warn"><i class="fa-solid fa-triangle-exclamation"></i></div>
+            </div>
+            <div class="kpi-card__value">18</div>
+            <div class="kpi-card__trend down"><i class="fa-solid fa-arrow-trend-up"></i> 5 need reorder today</div>
+          </div>
+        </div>
+
+        <div class="col-6 col-lg-3">
+          <div class="kpi-card">
+            <div class="kpi-card__top">
+              <span class="kpi-card__label">Total stock value</span>
+              <div class="kpi-card__icon kpi-card__icon--brand"><i class="fa-solid fa-warehouse"></i></div>
+            </div>
+            <div class="kpi-card__value">$482.6k</div>
+            <div class="kpi-card__trend up"><i class="fa-solid fa-arrow-trend-up"></i> +4.2% vs last month</div>
+          </div>
+        </div>
+
+        <div class="col-6 col-lg-3">
+          <div class="kpi-card">
+            <div class="kpi-card__top">
+              <span class="kpi-card__label">Revenue (30d)</span>
+              <div class="kpi-card__icon kpi-card__icon--good"><i class="fa-solid fa-sack-dollar"></i></div>
+            </div>
+            <div class="kpi-card__value">$61.3k</div>
+            <div class="kpi-card__trend up"><i class="fa-solid fa-arrow-trend-up"></i> +17% vs last month</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ============================== CHARTS ============================== -->
+      <div class="row g-3 mb-4">
+        <div class="col-lg-7">
+          <div class="panel h-100">
+            <div class="panel__header">
+              <div>
+                <h2>Stock movement</h2>
+                <p>Units received vs. units shipped, last 6 months</p>
+              </div>
+              <div class="d-flex gap-3" style="font-size:0.78rem; color: var(--text-secondary);">
+                <span><span class="legend-dot" style="background:#2f6f4e;"></span>In</span>
+                <span><span class="legend-dot" style="background:#c4622d;"></span>Out</span>
+              </div>
+            </div>
+            <div class="panel__body">
+              <div class="chart-wrap"><canvas id="stockMovementChart"></canvas></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-lg-5">
+          <div class="panel h-100">
+            <div class="panel__header">
+              <div>
+                <h2>Sales trend</h2>
+                <p>Revenue, last 6 months</p>
+              </div>
+            </div>
+            <div class="panel__body">
+              <div class="chart-wrap"><canvas id="salesTrendChart"></canvas></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ============================== PRODUCTS TABLE ============================== -->
+      <div class="panel">
+        <div class="panel__header">
+          <div>
+            <h2>Products</h2>
+            <p>Manage inventory levels, pricing, and product details</p>
+          </div>
+          <div class="table-toolbar">
+            <div class="position-relative">
+              <input type="text" class="form-control" id="productSearch" placeholder="Search name or SKU…" style="width: 220px; padding-left: 2rem;">
+              <i class="fa-solid fa-magnifying-glass" style="position:absolute; left:0.65rem; top:50%; transform:translateY(-50%); font-size:0.78rem; color:var(--text-secondary);"></i>
+            </div>
+            <select class="form-select" id="categoryFilter" style="width: 160px;">
+              <option value="all">All categories</option>
+              <option value="Electronics">Electronics</option>
+              <option value="Apparel">Apparel</option>
+              <option value="Home & Kitchen">Home &amp; Kitchen</option>
+              <option value="Office">Office</option>
+              <option value="Outdoor">Outdoor</option>
+            </select>
+            <select class="form-select" id="statusFilter" style="width: 150px;">
+              <option value="all">All statuses</option>
+              <option value="in">In stock</option>
+              <option value="low">Low stock</option>
+              <option value="out">Out of stock</option>
+            </select>
+            <button class="btn-brand" id="openAddProductBtn"><i class="fa-solid fa-plus me-2"></i>Quick add</button>
+          </div>
+        </div>
+
+        <div class="table-scroll">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Product</th>
+                <th>SKU</th>
+                <th>Category</th>
+                <th>Price</th>
+                <th>Qty</th>
+                <th>Status</th>
+                <th style="text-align:right;">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="productTableBody">
+
+              <tr data-name="Wireless Mouse M1" data-sku="ELX-1042" data-category="Electronics" data-price="24.99" data-qty="182" data-status="in">
+                <td>
+                  <div class="product-cell">
+                    <div class="product-cell__thumb"><i class="fa-solid fa-computer-mouse"></i></div>
+                    <div>
+                      <div class="product-cell__name">Wireless Mouse M1</div>
+                      <div class="product-cell__sku">Logitech-compatible</div>
+                    </div>
+                  </div>
+                </td>
+                <td class="sku-code">ELX-1042</td>
+                <td>Electronics</td>
+                <td class="price-value">$24.99</td>
+                <td class="mono">182</td>
+                <td><span class="status-pill status-pill--in">In stock</span></td>
+                <td>
+                  <div class="row-actions justify-content-end">
+                    <button class="js-view-product" title="View"><i class="fa-regular fa-eye"></i></button>
+                    <button class="js-edit-product" title="Edit"><i class="fa-solid fa-pen"></i></button>
+                    <button class="js-delete-product danger" title="Delete"><i class="fa-solid fa-trash"></i></button>
+                  </div>
+                </td>
+              </tr>
+
+              <tr data-name="Organic Cotton Tee" data-sku="APP-0231" data-category="Apparel" data-price="18.50" data-qty="9" data-status="low">
+                <td>
+                  <div class="product-cell">
+                    <div class="product-cell__thumb"><i class="fa-solid fa-shirt"></i></div>
+                    <div>
+                      <div class="product-cell__name">Organic Cotton Tee</div>
+                      <div class="product-cell__sku">Size run: S–XL</div>
+                    </div>
+                  </div>
+                </td>
+                <td class="sku-code">APP-0231</td>
+                <td>Apparel</td>
+                <td class="price-value">$18.50</td>
+                <td class="mono">9</td>
+                <td><span class="status-pill status-pill--low">Low stock</span></td>
+                <td>
+                  <div class="row-actions justify-content-end">
+                    <button class="js-view-product" title="View"><i class="fa-regular fa-eye"></i></button>
+                    <button class="js-edit-product" title="Edit"><i class="fa-solid fa-pen"></i></button>
+                    <button class="js-delete-product danger" title="Delete"><i class="fa-solid fa-trash"></i></button>
+                  </div>
+                </td>
+              </tr>
+
+              <tr data-name="Ceramic Pour-Over Set" data-sku="HMK-0587" data-category="Home & Kitchen" data-price="42.00" data-qty="0" data-status="out">
+                <td>
+                  <div class="product-cell">
+                    <div class="product-cell__thumb"><i class="fa-solid fa-mug-hot"></i></div>
+                    <div>
+                      <div class="product-cell__name">Ceramic Pour-Over Set</div>
+                      <div class="product-cell__sku">Includes filter stand</div>
+                    </div>
+                  </div>
+                </td>
+                <td class="sku-code">HMK-0587</td>
+                <td>Home &amp; Kitchen</td>
+                <td class="price-value">$42.00</td>
+                <td class="mono">0</td>
+                <td><span class="status-pill status-pill--out">Out of stock</span></td>
+                <td>
+                  <div class="row-actions justify-content-end">
+                    <button class="js-view-product" title="View"><i class="fa-regular fa-eye"></i></button>
+                    <button class="js-edit-product" title="Edit"><i class="fa-solid fa-pen"></i></button>
+                    <button class="js-delete-product danger" title="Delete"><i class="fa-solid fa-trash"></i></button>
+                  </div>
+                </td>
+              </tr>
+
+              <tr data-name="A4 Recycled Notebook" data-sku="OFC-1190" data-category="Office" data-price="6.25" data-qty="340" data-status="in">
+                <td>
+                  <div class="product-cell">
+                    <div class="product-cell__thumb"><i class="fa-solid fa-book"></i></div>
+                    <div>
+                      <div class="product-cell__name">A4 Recycled Notebook</div>
+                      <div class="product-cell__sku">80 gsm, ruled</div>
+                    </div>
+                  </div>
+                </td>
+                <td class="sku-code">OFC-1190</td>
+                <td>Office</td>
+                <td class="price-value">$6.25</td>
+                <td class="mono">340</td>
+                <td><span class="status-pill status-pill--in">In stock</span></td>
+                <td>
+                  <div class="row-actions justify-content-end">
+                    <button class="js-view-product" title="View"><i class="fa-regular fa-eye"></i></button>
+                    <button class="js-edit-product" title="Edit"><i class="fa-solid fa-pen"></i></button>
+                    <button class="js-delete-product danger" title="Delete"><i class="fa-solid fa-trash"></i></button>
+                  </div>
+                </td>
+              </tr>
+
+              <tr data-name="Insulated Steel Bottle" data-sku="OUT-0765" data-category="Outdoor" data-price="21.00" data-qty="27" data-status="in">
+                <td>
+                  <div class="product-cell">
+                    <div class="product-cell__thumb"><i class="fa-solid fa-bottle-water"></i></div>
+                    <div>
+                      <div class="product-cell__name">Insulated Steel Bottle</div>
+                      <div class="product-cell__sku">750ml, 3 colours</div>
+                    </div>
+                  </div>
+                </td>
+                <td class="sku-code">OUT-0765</td>
+                <td>Outdoor</td>
+                <td class="price-value">$21.00</td>
+                <td class="mono">27</td>
+                <td><span class="status-pill status-pill--in">In stock</span></td>
+                <td>
+                  <div class="row-actions justify-content-end">
+                    <button class="js-view-product" title="View"><i class="fa-regular fa-eye"></i></button>
+                    <button class="js-edit-product" title="Edit"><i class="fa-solid fa-pen"></i></button>
+                    <button class="js-delete-product danger" title="Delete"><i class="fa-solid fa-trash"></i></button>
+                  </div>
+                </td>
+              </tr>
+
+              <tr data-name="Bluetooth Desk Speaker" data-sku="ELX-1109" data-category="Electronics" data-price="59.99" data-qty="6" data-status="low">
+                <td>
+                  <div class="product-cell">
+                    <div class="product-cell__thumb"><i class="fa-solid fa-volume-high"></i></div>
+                    <div>
+                      <div class="product-cell__name">Bluetooth Desk Speaker</div>
+                      <div class="product-cell__sku">12h battery</div>
+                    </div>
+                  </div>
+                </td>
+                <td class="sku-code">ELX-1109</td>
+                <td>Electronics</td>
+                <td class="price-value">$59.99</td>
+                <td class="mono">6</td>
+                <td><span class="status-pill status-pill--low">Low stock</span></td>
+                <td>
+                  <div class="row-actions justify-content-end">
+                    <button class="js-view-product" title="View"><i class="fa-regular fa-eye"></i></button>
+                    <button class="js-edit-product" title="Edit"><i class="fa-solid fa-pen"></i></button>
+                    <button class="js-delete-product danger" title="Delete"><i class="fa-solid fa-trash"></i></button>
+                  </div>
+                </td>
+              </tr>
+
+              <tr data-name="Canvas Tote Bag" data-sku="APP-0344" data-category="Apparel" data-price="14.00" data-qty="210" data-status="in">
+                <td>
+                  <div class="product-cell">
+                    <div class="product-cell__thumb"><i class="fa-solid fa-bag-shopping"></i></div>
+                    <div>
+                      <div class="product-cell__name">Canvas Tote Bag</div>
+                      <div class="product-cell__sku">Natural, unbleached</div>
+                    </div>
+                  </div>
+                </td>
+                <td class="sku-code">APP-0344</td>
+                <td>Apparel</td>
+                <td class="price-value">$14.00</td>
+                <td class="mono">210</td>
+                <td><span class="status-pill status-pill--in">In stock</span></td>
+                <td>
+                  <div class="row-actions justify-content-end">
+                    <button class="js-view-product" title="View"><i class="fa-regular fa-eye"></i></button>
+                    <button class="js-edit-product" title="Edit"><i class="fa-solid fa-pen"></i></button>
+                    <button class="js-delete-product danger" title="Delete"><i class="fa-solid fa-trash"></i></button>
+                  </div>
+                </td>
+              </tr>
+
+              <tr data-name="Standing Desk Mat" data-sku="OFC-1284" data-category="Office" data-price="33.75" data-qty="0" data-status="out">
+                <td>
+                  <div class="product-cell">
+                    <div class="product-cell__thumb"><i class="fa-solid fa-layer-group"></i></div>
+                    <div>
+                      <div class="product-cell__name">Standing Desk Mat</div>
+                      <div class="product-cell__sku">Anti-fatigue foam</div>
+                    </div>
+                  </div>
+                </td>
+                <td class="sku-code">OFC-1284</td>
+                <td>Office</td>
+                <td class="price-value">$33.75</td>
+                <td class="mono">0</td>
+                <td><span class="status-pill status-pill--out">Out of stock</span></td>
+                <td>
+                  <div class="row-actions justify-content-end">
+                    <button class="js-view-product" title="View"><i class="fa-regular fa-eye"></i></button>
+                    <button class="js-edit-product" title="Edit"><i class="fa-solid fa-pen"></i></button>
+                    <button class="js-delete-product danger" title="Delete"><i class="fa-solid fa-trash"></i></button>
+                  </div>
+                </td>
+              </tr>
+
+              <tr data-name="Trail Running Socks (3pk)" data-sku="OUT-0812" data-category="Outdoor" data-price="16.40" data-qty="88" data-status="in">
+                <td>
+                  <div class="product-cell">
+                    <div class="product-cell__thumb"><i class="fa-solid fa-socks"></i></div>
+                    <div>
+                      <div class="product-cell__name">Trail Running Socks (3pk)</div>
+                      <div class="product-cell__sku">Moisture-wicking</div>
+                    </div>
+                  </div>
+                </td>
+                <td class="sku-code">OUT-0812</td>
+                <td>Outdoor</td>
+                <td class="price-value">$16.40</td>
+                <td class="mono">88</td>
+                <td><span class="status-pill status-pill--in">In stock</span></td>
+                <td>
+                  <div class="row-actions justify-content-end">
+                    <button class="js-view-product" title="View"><i class="fa-regular fa-eye"></i></button>
+                    <button class="js-edit-product" title="Edit"><i class="fa-solid fa-pen"></i></button>
+                    <button class="js-delete-product danger" title="Delete"><i class="fa-solid fa-trash"></i></button>
+                  </div>
+                </td>
+              </tr>
+
+              <tr data-name="USB-C Hub 7-in-1" data-sku="ELX-1273" data-category="Electronics" data-price="45.00" data-qty="14" data-status="low">
+                <td>
+                  <div class="product-cell">
+                    <div class="product-cell__thumb"><i class="fa-solid fa-plug"></i></div>
+                    <div>
+                      <div class="product-cell__name">USB-C Hub 7-in-1</div>
+                      <div class="product-cell__sku">HDMI + SD + PD</div>
+                    </div>
+                  </div>
+                </td>
+                <td class="sku-code">ELX-1273</td>
+                <td>Electronics</td>
+                <td class="price-value">$45.00</td>
+                <td class="mono">14</td>
+                <td><span class="status-pill status-pill--low">Low stock</span></td>
+                <td>
+                  <div class="row-actions justify-content-end">
+                    <button class="js-view-product" title="View"><i class="fa-regular fa-eye"></i></button>
+                    <button class="js-edit-product" title="Edit"><i class="fa-solid fa-pen"></i></button>
+                    <button class="js-delete-product danger" title="Delete"><i class="fa-solid fa-trash"></i></button>
+                  </div>
+                </td>
+              </tr>
+
+            </tbody>
+          </table>
+        </div>
+
+        <div class="panel__footer">
+          <span id="resultsCount">Showing all products</span>
+          <div class="d-flex align-items-center gap-3">
+            <div class="d-flex align-items-center gap-2">
+              <span>Rows per page</span>
+              <select class="form-select form-select-sm" id="rowsPerPage" style="width: 72px;">
+                <option value="5">5</option>
+                <option value="8" selected>8</option>
+                <option value="20">20</option>
+              </select>
+            </div>
+            <nav class="pagination" id="tablePagination" aria-label="Table pagination"></nav>
+          </div>
+        </div>
+      </div>
+
+    </main>
+  </div>
+</div>
+
+<!-- ============================== ADD / EDIT PRODUCT MODAL ============================== -->
+<div class="modal fade" id="addProductModal" tabindex="-1" aria-labelledby="addProductModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-content">
+      <form id="productForm" class="needs-validation" novalidate>
+        <div class="modal-header">
+          <h5 class="modal-title" id="addProductModalLabel">Add product</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <div class="row g-3">
+            <div class="col-md-5">
+              <label class="form-label">Product image</label>
+              <div class="image-drop" id="imageDropZone">
+                <img id="imagePreview" class="d-none" alt="Product preview">
+                <div id="imageDropText">
+                  <i class="fa-solid fa-cloud-arrow-up d-block mb-1"></i>
+                  <div>Click to upload an image</div>
+                  <div style="font-size:0.72rem;">PNG or JPG, up to 5MB</div>
+                </div>
+              </div>
+              <input type="file" id="productImageInput" accept="image/*" class="d-none">
+
+              <label class="form-label mt-3">Description</label>
+              <textarea class="form-control" rows="4" id="productDescInput" placeholder="Short product description…"></textarea>
+            </div>
+
+            <div class="col-md-7">
+              <div class="row g-3">
+                <div class="col-12">
+                  <label class="form-label">Product name</label>
+                  <input type="text" class="form-control" id="productNameInput" placeholder="e.g. Wireless Mouse M1" required>
+                  <div class="invalid-feedback">Product name is required.</div>
+                </div>
+                <div class="col-6">
+                  <label class="form-label">SKU / Code</label>
+                  <input type="text" class="form-control mono" id="productSkuInput" placeholder="e.g. ELX-1042" required>
+                  <div class="invalid-feedback">SKU is required.</div>
+                </div>
+                <div class="col-6">
+                  <label class="form-label">Category</label>
+                  <select class="form-select" id="productCategoryInput" required>
+                    <option value="" selected disabled>Select…</option>
+                    <option value="Electronics">Electronics</option>
+                    <option value="Apparel">Apparel</option>
+                    <option value="Home & Kitchen">Home &amp; Kitchen</option>
+                    <option value="Office">Office</option>
+                    <option value="Outdoor">Outdoor</option>
+                  </select>
+                </div>
+                <div class="col-6">
+                  <label class="form-label">Price ($)</label>
+                  <input type="number" class="form-control" id="productPriceInput" placeholder="0.00" step="0.01" min="0" required>
+                </div>
+                <div class="col-6">
+                  <label class="form-label">Quantity</label>
+                  <input type="number" class="form-control" id="productQtyInput" placeholder="0" min="0" required>
+                </div>
+                <div class="col-12">
+                  <label class="form-label">Supplier</label>
+                  <select class="form-select" id="productSupplierInput">
+                    <option value="" selected disabled>Select a supplier…</option>
+                    <option>Meridian Supply Co.</option>
+                    <option>Northwind Traders</option>
+                    <option>Pinecrest Goods</option>
+                    <option>Harbor & Co.</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn-outline-quiet" data-bs-dismiss="modal">Cancel</button>
+          <button type="submit" class="btn-brand" id="saveProductBtn">Save product</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- ============================== VIEW PRODUCT MODAL ============================== -->
+<div class="modal fade" id="viewProductModal" tabindex="-1" aria-labelledby="viewProductModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="viewProductModalLabel">Product details</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div class="d-flex gap-3 mb-3">
+          <div class="product-cell__thumb" style="width:64px; height:64px; font-size:1.4rem;">
+            <img id="viewProductImage" class="d-none" alt="">
+            <i class="fa-solid fa-box d-block" id="viewProductFallbackIcon"></i>
+          </div>
+          <div>
+            <div class="fw-semibold fs-6" id="viewProductName">—</div>
+            <div class="sku-code" id="viewProductSku">—</div>
+          </div>
+        </div>
+        <div class="row g-3">
+          <div class="col-6">
+            <div class="form-label mb-1">Category</div>
+            <div id="viewProductCategory">—</div>
+          </div>
+          <div class="col-6">
+            <div class="form-label mb-1">Price</div>
+            <div id="viewProductPrice">—</div>
+          </div>
+          <div class="col-6">
+            <div class="form-label mb-1">Quantity in stock</div>
+            <div id="viewProductQty">—</div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn-outline-quiet" data-bs-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================== DELETE CONFIRMATION MODAL ============================== -->
+<div class="modal fade" id="deleteConfirmModal" tabindex="-1" aria-labelledby="deleteConfirmModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-sm">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="deleteConfirmModalLabel">Delete product?</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <p class="mb-0">This will permanently remove <strong id="deleteTargetName">this product</strong> from your inventory. This can't be undone.</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn-outline-quiet" data-bs-dismiss="modal">Cancel</button>
+        <button type="button" class="btn btn-danger" id="confirmDeleteBtn">Delete</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Toast container -->
+<div class="toast-container position-fixed bottom-0 end-0 p-3" id="toastContainer" style="z-index: 1080;"></div>
+
+<!-- Scripts -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.4/chart.umd.min.js"></script>
+<script src="/asset/js/main.js"></script>
+</body>
+</html>
